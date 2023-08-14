@@ -450,7 +450,7 @@ namespace Azure.Core.Pipeline
             }
 
 #if NET6_0_OR_GREATER
-            [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026", Justification = "The values being passed into Write have the commonly used properties being preserved with DynamicDependency on the ActivityAdapter.Start() method.")]
+            [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "The values being passed into Write have the commonly used properties being preserved with DynamicDependency on the ActivityAdapter.Start() method.")]
 #endif
             private void WriteStartEvent()
             {
@@ -508,7 +508,7 @@ namespace Azure.Core.Pipeline
             }
 
 #if NET6_0_OR_GREATER
-            [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The exception is used in a call to DiagnosticSource.Write, all necessary properties need to be preserved on the exception type being passed in using DynamicDependency attributes.")]
+            [RequiresUnreferencedCode("The exception is used in a call to DiagnosticSource.Write, all necessary properties need to be preserved on the exception type being passed in using DynamicDependency attributes.")]
 #endif
             public void MarkFailed(Exception? exception)
             {
