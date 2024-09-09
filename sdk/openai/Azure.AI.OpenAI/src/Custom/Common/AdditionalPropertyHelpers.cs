@@ -2,13 +2,17 @@
 // Licensed under the MIT License.
 
 using System.ClientModel.Primitives;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Azure.AI.OpenAI.Internal;
 
 internal static class AdditionalPropertyHelpers
 {
-    internal static T GetAdditionalProperty<T>(IDictionary<string, BinaryData> additionalProperties, string key)
+    internal static T GetAdditionalProperty<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T>(
+        IDictionary<string, BinaryData> additionalProperties, string key)
         where T : class, IJsonModel<T>
     {
         if (additionalProperties?.TryGetValue(key, out BinaryData binaryProperty) != true)
@@ -18,7 +22,9 @@ internal static class AdditionalPropertyHelpers
         return (T)ModelReaderWriter.Read(binaryProperty, typeof(T));
     }
 
-    internal static IList<T> GetAdditionalListProperty<T>(IDictionary<string, BinaryData> additionalProperties, string key)
+    internal static IList<T> GetAdditionalListProperty<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T>(
+        IDictionary<string, BinaryData> additionalProperties, string key)
         where T : class, IJsonModel<T>
     {
         if (additionalProperties?.TryGetValue(key, out BinaryData binaryProperty) != true)
@@ -29,7 +35,9 @@ internal static class AdditionalPropertyHelpers
         using JsonDocument document = JsonDocument.Parse(binaryProperty);
         foreach (JsonElement element in document.RootElement.EnumerateArray())
         {
-            items.Add((T)ModelReaderWriter.Read(BinaryData.FromObjectAsJson(element), typeof(T)));
+            items.Add((T)ModelReaderWriter.Read(
+                BinaryData.FromObjectAsJson(element, AzureOpenAIJsonSerializerContext.Default.JsonElement),
+                typeof(T)));
         }
         return items;
     }
@@ -46,3 +54,6 @@ internal static class AdditionalPropertyHelpers
         additionalProperties[key] = binaryValue;
     }
 }
+
+[JsonSerializable(typeof(JsonElement))]
+internal partial class AzureOpenAIJsonSerializerContext : JsonSerializerContext { }
