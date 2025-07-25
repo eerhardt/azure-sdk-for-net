@@ -192,6 +192,21 @@ public class ConditionalExpression(BicepExpression condition, BicepExpression co
         writer.Append(Condition).Append(" ? ").Append(Consequent).Append(" : ").Append(Alternate);
 }
 
+public class IfConditionExpression(BicepExpression condition, ObjectExpression consequent) : BicepExpression
+{
+    public BicepExpression Condition { get; } = condition;
+    public ObjectExpression Consequent { get; } = consequent;
+    internal override BicepWriter Write(BicepWriter writer) =>
+        writer.Append("if ")
+              .AppendIf(RequiresParentheses, w => w.Append('('))
+              .Append(Condition)
+              .AppendIf(RequiresParentheses, w => w.Append(')'))
+              .Append(' ')
+              .Append(Consequent);
+
+    private bool RequiresParentheses => Condition is not BinaryExpression;
+}
+
 public class IndexExpression(BicepExpression value, BicepExpression index) : BicepExpression
 {
     public BicepExpression Value { get; } = value;
